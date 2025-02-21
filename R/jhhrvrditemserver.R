@@ -75,6 +75,14 @@ addrditemserver <- function(input,output,session,dms_token) {
                             sql = paste0("insert into rds_hrv_src_md_rditem values('",FOrg,"','",FRDProjectManual,"','",FRDProject,"')
 ")
                             tsda::sql_insert2(token = dms_token,sql_str = sql)
+                            sql_insert=paste0("INSERT INTO rds_hrv_ods_md_rditem (FOrg,FRDProjectManual,FRDProject)
+SELECT a.FOrg,a.FRDProjectManual,a.FRDProject
+FROM rds_hrv_src_md_rditem A
+WHERE NOT EXISTS (
+SELECT 1
+FROM rds_hrv_ods_md_rditem B
+WHERE B.FRDProject = A.FRDProject ) ")
+                            tsda::sql_insert2(token = dms_token,sql_str = sql_insert)
                             
                             tsui::pop_notice('研发项目新增成功')
                           }
@@ -101,6 +109,10 @@ addrditemserver <- function(input,output,session,dms_token) {
                             sql =paste0("delete from rds_hrv_src_md_rditem where FRDProject='",FRDProject,"'") 
                             
                             tsda::sql_delete2(token = dms_token,sql_str  = sql)
+                            sql_delete=paste0("delete from rds_hrv_ods_md_rditem where FRDProject='",FRDProject,"'") 
+                            
+                            
+                            tsda::sql_delete2(token = dms_token,sql_str  = sql_delete)
                             tsui::pop_notice("删除成功")
                             
                           }
